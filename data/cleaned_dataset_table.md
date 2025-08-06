@@ -1,4 +1,4 @@
-### Summary of Cleaned Titanic Data Versions
+# Summary of Cleaned Titanic Data Versions
 
 | Version         | Rows | Columns | Remaining Nulls | Description                          |
 |-----------------|------|---------|-----------------|--------------------------------------|

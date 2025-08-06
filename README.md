@@ -2,7 +2,7 @@
 
 ## Project Structure
 
-- Organized data folder for raw, processed, interim, and external data.
+- Organized data folder for raw, cleaned and processed data.
 - Notebooks for data preparation and EDA.
 - Requirements file for dependencies.
 
@@ -17,10 +17,13 @@ python -m venv ml-venv
 ### 2. Activate the Virtual Environment
 
 - **Windows (Command Prompt):**
+
   ```bash
   ml-venv\Scripts\activate
   ```
+
 - **Windows (Git Bash):**
+
   ```bash
   source ml-venv/Scripts/activate
   ```

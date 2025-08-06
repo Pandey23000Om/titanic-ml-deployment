@@ -1,16 +1,14 @@
 # Data Folder Structure
 
 - **raw/**: Original, immutable data.
-- **processed/**: Cleaned and processed data for modeling.
-- **interim/**: Intermediate data files.
-- **external/**: Data from third-party sources.
+- **cleaned/**: Cleaned data for processing/EDA.
+- **processed/**: processed data for modeling.
 
 ## Usage
 
 - Place original data files in the `raw/` folder.
-- Store cleaned and feature-engineered data in `processed/`.
-- Use `interim/` for temporary or intermediate files.
-- Add any third-party datasets to `external/`.
+- Store cleaned data in `cleaned/` for EDA
+- Put feature-engineered data in `processed/`.
 
 ## Data Dictionary
 
