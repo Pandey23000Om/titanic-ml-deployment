@@ -8,6 +8,8 @@
 
 ## Getting Started
 
+successfully tested with python 3.11.9
+
 ### 1. Create a Virtual Environment
 
 ```bash

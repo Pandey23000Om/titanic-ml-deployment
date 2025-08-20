@@ -7,5 +7,4 @@ scipy
 catboost
 xgboost
 ipykernel
-glob
 statsmodels

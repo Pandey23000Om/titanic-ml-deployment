@@ -1,3 +1,6 @@
 desktop.ini
 ml-venv/
 notebook/catboost*
+notebooks/1-dropna-collection/catboost_info
+notebooks/2-simple-impute-collection/catboost_info
+notebooks/3-grouped-impute-collection/catboost_info
