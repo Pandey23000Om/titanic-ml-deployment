@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Titanic Survival Predictor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen flex items-center justify-center">
+  <div class="bg-white shadow-xl rounded-2xl p-8 w-full max-w-lg">
+    <h1 class="text-2xl font-bold mb-6 text-center text-indigo-600">🚢 Titanic Survival Prediction</h1>
+
+    <form id="predictForm" class="space-y-4">
+      <div>
+        <label class="block font-medium">Passenger Class</label>
+        <input type="number" name="Pclass" min="1" max="3" class="w-full border rounded px-3 py-2" required>
+      </div>
+
+      <div>
+        <label class="block font-medium">Sex</label>
+        <select name="Sex" class="w-full border rounded px-3 py-2">
+          <option value="male">Male</option>
+          <option value="female">Female</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block font-medium">Age</label>
+        <input type="number" name="Age" min="0" class="w-full border rounded px-3 py-2" required>
+      </div>
+
+      <div>
+        <label class="block font-medium">Fare</label>
+        <input type="number" name="Fare" min="0" step="1" class="w-full border rounded px-3 py-2" required>
+      </div>
+
+      <div>
+        <label class="block font-medium">Siblings/Spouses</label>
+        <input type="number" name="SibSp" min="0" class="w-full border rounded px-3 py-2" required>
+      </div>
+
+      <div>
+        <label class="block font-medium">Parents/Children</label>
+        <input type="number" name="Parch" min="0" class="w-full border rounded px-3 py-2" required>
+      </div>
+
+      <div>
+        <label class="block font-medium">Embarked</label>
+        <select name="Embarked" class="w-full border rounded px-3 py-2">
+          <option value="S">Southampton</option>
+          <option value="C">Cherbourg</option>
+          <option value="Q">Queenstown</option>
+        </select>
+      </div>
+
+      <button type="submit" class="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        Predict
+      </button>
+    </form>
+
+    <div id="result" class="mt-6 text-center"></div>
+  </div>
+
+  <script>
+    const form = document.getElementById("predictForm");
+    const resultDiv = document.getElementById("result");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const formData = Object.fromEntries(new FormData(form).entries());
+
+      const response = await fetch("/predict_processed", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(formData)
+      });
+
+      const data = await response.json();
+      resultDiv.innerHTML = `
+        <p class="text-lg font-medium">Prediction: 
+          <span class="font-bold ${data.survived ? 'text-green-600' : 'text-red-600'}">
+            ${data.survived ? "Survived" : "Did not survive"}
+          </span>
+        </p>
+        <p class="text-gray-600">Probability of survival: ${(data.probability_of_survival * 100).toFixed(2)}%</p>
+      `;
+    });
+  </script>
+</body>
+</html>

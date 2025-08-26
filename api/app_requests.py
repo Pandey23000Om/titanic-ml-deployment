@@ -10,7 +10,7 @@ payload = {
     "PassengerId": "1",
     "Pclass": 3,
     "Name": "John Doe",
-    "Sex": "male",
+    "Sex": "female",
     "Age": 22.0,
     "SibSp": 1,
     "Parch": 0,
@@ -25,8 +25,8 @@ print(response.json())
 
 url = "http://127.0.0.1:8000/predict_processed"
 payload = {
-    "Pclass": 3,
-    "Sex_male": 1,
+    "Pclass": 2,
+    "Sex_male": 0,
     "Age_Bin": 1,
     "Family_Group": 1,
     "Fare_Bin": 0,

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>ML Titanic Predictor</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+  <div class="bg-white shadow-lg rounded-2xl p-6 w-full max-w-3xl">
+    <h1 class="text-2xl font-bold text-center mb-6">Titanic Survival Predictor</h1>
+
+    <!-- Tabs -->
+    <div class="flex mb-6">
+      <button id="btn-raw" class="flex-1 py-2 bg-blue-500 text-white rounded-l">Raw Form (/predict)</button>
+      <button id="btn-processed" class="flex-1 py-2 bg-gray-200 text-gray-700 rounded-r">Processed (/predict_processed)</button>
+    </div>
+
+    <!-- RAW FORM -->
+    <form id="raw-form" class="space-y-4">
+      <input type="number" name="PassengerId" placeholder="Passenger ID" class="w-full p-2 border rounded" required>
+      <input type="text" name="Pclass" placeholder="Class (1, 2, 3)" class="w-full p-2 border rounded" required>
+      <input type="text" name="Name" placeholder="Name" class="w-full p-2 border rounded">
+      <input type="text" name="Sex" placeholder="Sex (male/female)" class="w-full p-2 border rounded" required>
+      <input type="number" name="Age" placeholder="Age" class="w-full p-2 border rounded">
+      <input type="number" name="SibSp" placeholder="Siblings/Spouses Aboard" class="w-full p-2 border rounded" required>
+      <input type="number" name="Parch" placeholder="Parents/Children Aboard" class="w-full p-2 border rounded" required>
+      <input type="text" name="Ticket" placeholder="Ticket Number" class="w-full p-2 border rounded">
+      <input type="number" step="0.01" name="Fare" placeholder="Fare" class="w-full p-2 border rounded" required>
+      <input type="text" name="Cabin" placeholder="Cabin" class="w-full p-2 border rounded">
+      <input type="text" name="Embarked" placeholder="Embarked (C/Q/S)" class="w-full p-2 border rounded" required>
+
+      <button type="submit" class="w-full bg-yellow-400 text-white px-4 py-2 rounded hover:bg-blue-600">Predict</button>
+    </form>
+
+    <!-- PROCESSED FORM -->
+    <form id="processed-form" class="space-y-4 hidden">
+      <input type="number" name="Pclass" placeholder="Passenger Ticket Class (1,2,3)" class="w-full p-2 border rounded" required>
+      <input type="number" name="Sex_male" placeholder="Sex_male (1/0)" class="w-full p-2 border rounded" required>
+      <input type="number" name="Age_Bin" placeholder="Age_bin" class="w-full p-2 border rounded" required>
+      <input type="number" name="Family_Group" placeholder="SibSp" class="w-full p-2 border rounded" required>
+      <input type="number" name="Fare_Bin" placeholder="Fare_bin" class="w-full p-2 border rounded" required>
+      <input type="number" name="Embarked_Q" placeholder="Embarked (C/Q/S)" class="w-full p-2 border rounded" required>
+      <input type="number" name="Embarked_S" placeholder="Embarked (C/Q/S)" class="w-full p-2 border rounded" required>
+
+      <button type="submit" class="w-full bg-yellow-400 text-white px-4 py-2 rounded hover:bg-green-600">Predict</button>
+    </form>
+
+    <!-- Result -->
+    <div id="result" class="mt-6 text-center text-lg font-semibold"></div>
+  </div>
+
+  <script>
+    // Toggle forms
+    const rawForm = document.getElementById("raw-form");
+    const processedForm = document.getElementById("processed-form");
+    const btnRaw = document.getElementById("btn-raw");
+    const btnProcessed = document.getElementById("btn-processed");
+
+    btnRaw.addEventListener("click", () => {
+      rawForm.classList.remove("hidden");
+      processedForm.classList.add("hidden");
+      btnRaw.classList.add("bg-blue-500", "text-white");
+      btnRaw.classList.remove("bg-gray-200", "text-gray-700");
+      btnProcessed.classList.remove("bg-blue-500", "text-white");
+      btnProcessed.classList.add("bg-gray-200", "text-gray-700");
+    });
+
+    btnProcessed.addEventListener("click", () => {
+      processedForm.classList.remove("hidden");
+      rawForm.classList.add("hidden");
+      btnProcessed.classList.remove("bg-gray-200", "text-gray-700");
+      btnProcessed.classList.add("bg-blue-500", "text-white");
+      btnRaw.classList.remove("bg-blue-500", "text-white");
+      btnRaw.classList.add("bg-gray-200", "text-gray-700");
+    });
+
+    // Handle both forms
+    async function handleSubmit(event, endpoint) {
+      event.preventDefault();
+      const formData = new FormData(event.target);
+      const data = Object.fromEntries(formData.entries());
+
+      const res = await fetch(endpoint, {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(data)
+      });
+
+      const json = await res.json();
+      document.getElementById("result").textContent =
+        "Prediction: " + JSON.stringify(json);
+    }
+
+    rawForm.addEventListener("submit", (e) => handleSubmit(e, "/predict"));
+    processedForm.addEventListener("submit", (e) => handleSubmit(e, "/predict_processed"));
+  </script>
+</body>
+</html>

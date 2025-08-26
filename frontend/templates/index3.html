@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Titanic Survival Prediction</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    h1 { color: #2c3e50; }
+    form { margin-bottom: 2rem; }
+    label { display: block; margin-top: 1rem; }
+    input, select { padding: 0.4rem; margin-top: 0.3rem; }
+    button { margin-top: 1rem; padding: 0.6rem 1rem; cursor: pointer; }
+    .result { margin-top: 2rem; font-size: 1.2rem; }
+  </style>
+</head>
+<body>
+  <h1>🚢 Titanic Survival Predictor</h1>
+
+  <form id="predictForm">
+    <label>Pclass (1, 2, or 3): <input type="number" name="Pclass" min="1" max="3" required></label>
+    <label>Sex (male=1, female=0): <input type="number" name="Sex_male" min="0" max="1" required></label>
+    <label>Age Bin: <input type="number" name="Age_Bin" step="1" min="0" required></label>
+    <label>Family Group Size: <input type="number" name="Family_Group" min="0" required></label>
+    <label>Fare Bin (0-3): <input type="number" name="Fare_Bin" min="0" max="3" required></label>
+    <label>Embarked_Q (0 or 1): <input type="number" name="Embarked_Q" min="0" max="1" required></label>
+    <label>Embarked_S (0 or 1): <input type="number" name="Embarked_S" min="0" max="1" required></label>
+    <button type="submit">Predict</button>
+  </form>
+
+  <div class="result" id="result"></div>
+
+  <script>
+    document.getElementById("predictForm").addEventListener("submit", async function (e) {
+      e.preventDefault();
+
+      const formData = new FormData(e.target);
+      const data = Object.fromEntries(formData.entries());
+
+      // Convert string values to numbers
+      for (let key in data) {
+        data[key] = Number(data[key]);
+      }
+
+      try {
+        const response = await fetch("http://127.0.0.1:8000/predict_processed", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data)
+        });
+
+        const result = await response.json();
+
+        document.getElementById("result").innerHTML = `
+          <strong>Prediction:</strong> ${result.prediction} <br>
+          <strong>Survived:</strong> ${result.survived} <br>
+          <strong>Probability of Survival:</strong> ${(result.probability_of_survival * 100).toFixed(2)}%
+        `;
+      } catch (err) {
+        document.getElementById("result").innerText = "Error: " + err.message;
+      }
+    });
+  </script>
+</body>
+</html>

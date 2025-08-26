@@ -1,7 +1,12 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from pydantic import BaseModel, Field
-from typing import Optional
+from typing import Optional, Literal
 import joblib
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import HTMLResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
+import os
 
 # import numpy as np
 import pandas as pd
@@ -11,8 +16,23 @@ import pandas as pd
 # Initialize FastAPI
 app = FastAPI(title="Titanic Survival Prediction API")
 
+# Allow frontend requests
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://127.0.0.1:8000", "null"],  # or [*] if you want linience
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Mount static files
+app.mount("/static", StaticFiles(directory=os.path.join("..", "frontend", "static")), name="static")
+
+# Tell FastAPI where templates live
+templates = Jinja2Templates(directory=os.path.join("..", "frontend", "templates"))
+
 # Load saved model once at startup
-model = joblib.load("../model/svm_model.pkl")
+model = joblib.load("model/svm_model.pkl")
 
 
 # Define input schema (features according to the raw dataset)
@@ -27,16 +47,16 @@ class PassengerRaw(BaseModel):
     Ticket: Optional[str] = None
     Fare: float = Field(..., ge=0)
     Cabin: Optional[str] = None
-    Embarked: str = "S"  # default value
+    Embarked: Literal["C", "Q", "S"] = "S"  # default value
 
 
 # Define input schema (features according to the model-ready dataset)
 class PassengerProcessed(BaseModel):
     Pclass: int = Field(..., ge=1, le=3)  # must be 1,2,3
     Sex_male: int = Field(..., ge=0, le=1)  # must be 0 or 1
-    Age_Bin: float = Field(..., ge=0)  # no negatives
+    Age_Bin: int = Field(..., ge=0)  # no negatives
     Family_Group: int = Field(..., ge=0)
-    Fare_Bin: float = Field(..., ge=0, le=3)
+    Fare_Bin: int = Field(..., ge=0, le=3)
     Embarked_Q: int = Field(..., ge=0, le=1)
     Embarked_S: int = Field(..., ge=0, le=1)
 
@@ -98,7 +118,12 @@ def preprocess_input_data(passenger: PassengerRaw):
     return pd.DataFrame([data], columns=FEATURES)
 
 
-@app.get("/")
+@app.get("/", response_class=HTMLResponse)
+async def get_home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+
+@app.get("/api")
 def root():
     return {
         "message": "Titanic Survival Prediction API is running! Open '/docs' to begin testing using swagger"

@@ -14,3 +14,5 @@ joblib
 # for APIs
 fastapi
 pydantic
+jinja2
+streamlit
