@@ -72,13 +72,20 @@ pip install joblib
 
 ---
 
-### 5. **Optional**
+### 5. **Requests**
 
-* **Requests**: If you want to test API calls from Python instead of Swagger.
+* **Why**: If you want to test API calls from Python instead of Swagger.
 
   ```bash
   pip install requests
   ```
-* **Docker / Cloud tools**: For deployment phase (not yet).
 
 ---
+
+### 5. **Streamlit**
+
+* **What**: is a Python framework for building interactive web apps—specifically designed for data science, machine learning, and analytics projects.
+
+* **Why**: you can instantly build a web form where users input data → click a button → get predictions. Explore datasets, filter, sort, visualize—without html, css, or js.
+
+* **Benefit**: Run locally or deploy online with Streamlit Cloud, Hugging Face Spaces, or Heroku.
