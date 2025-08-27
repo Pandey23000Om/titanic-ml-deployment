@@ -37,8 +37,8 @@ python -m venv ml-venv
 ```bash
 pip install -r requirements.txt
 ```
-
-## Notes
+---
+### Note
 
 - All data files should be placed in the appropriate `data/` subfolders.
 - The virtual environment (`ml-venv/`) is excluded from version control via `.gitignore`.
