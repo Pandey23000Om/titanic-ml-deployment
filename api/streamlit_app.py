@@ -1,56 +1,71 @@
 import streamlit as st
 import requests
 
-st.set_page_config(page_title="Titanic Survival Predictor", layout="centered")
+API_URL = "http://127.0.0.1:8000"  # your FastAPI backend
 
-st.title("🚢 Titanic Survival Prediction")
-st.write("Enter passenger details to predict survival probability.")
+st.set_page_config(page_title="Titanic Survival Prediction", page_icon="🚢", layout="centered")
 
-# Choose raw vs processed
-option = st.radio("Select Input Type:", ["Raw Passenger Data", "Processed Features"])
+st.title("🚢 Titanic Survival Prediction Dashboard")
+st.markdown("Choose **Raw Input** if you want to enter passenger details. Or, use **Processed Input** if you already have engineered features.")
+# Choice of input type
+input_type = st.selectbox(
+    "Choose input type:",
+    ["Raw Input", "Processed Features"]
+)
 
-if option == "Raw Passenger Data":
-    st.subheader("Raw Passenger Data")
-    Pclass = st.selectbox("Passenger Class (1 = Upper, 2 = Middle, 3 = Lower)", [1, 2, 3])
-    Sex = st.selectbox("Sex", ["male", "female"])
-    Age = st.slider("Age", 0, 80, 25)
-    SibSp = st.number_input("Number of Siblings/Spouses aboard", 0, 8, 0)
-    Parch = st.number_input("Number of Parents/Children aboard", 0, 6, 0)
-    Fare = st.number_input("Fare", 0.0, 500.0, 32.0)
-    Embarked = st.selectbox("Port of Embarkation", ["C", "Q", "S"])
+st.write("---")
 
-    if st.button("Predict"):
-        payload = {
-            "Pclass": Pclass,
-            "Sex": Sex,
-            "Age": Age,
-            "SibSp": SibSp,
-            "Parch": Parch,
-            "Fare": Fare,
-            "Embarked": Embarked
-        }
-        res = requests.post("http://127.0.0.1:8000/predict", json=payload)  # FastAPI raw endpoint
-        st.write(res.json())
+if input_type == "Raw Input":
+    st.subheader("Enter Passenger Details (Raw Schema)")
 
-else:
-    st.subheader("Processed Passenger Features")
-    Pclass = st.selectbox("Passenger Class", [1, 2, 3])
-    Sex_male = st.selectbox("Is Male?", [0, 1])
-    Embarked_Q = st.selectbox("Embarked at Q?", [0, 1])
-    Embarked_S = st.selectbox("Embarked at S?", [0, 1])
-    Fare_Bin = st.selectbox("Fare Bin", [0, 1, 2, 3])
-    Age_Bin = st.selectbox("Age Bin", [0, 1, 2, 3])
-    Family_Group = st.selectbox("Family Group", [0, 1, 2])
+    passenger_data = {
+        "PassengerId": st.text_input("Passenger ID (optional)"),
+        "Pclass": st.selectbox("Class (1 = 1st, 2 = 2nd, 3 = 3rd)", [1, 2, 3]),
+        "Name": st.text_input("Name (optional)"),
+        "Sex": st.selectbox("Sex", ["male", "female"]),
+        "Age": st.number_input("Age", min_value=0, step=1),
+        "SibSp": st.number_input("Siblings/Spouses Aboard", min_value=0, step=1),
+        "Parch": st.number_input("Parents/Children Aboard", min_value=0, step=1),
+        "Ticket": st.text_input("Ticket (optional)"),
+        "Fare": st.number_input("Fare", min_value=0.0, step=0.5),
+        "Cabin": st.text_input("Cabin (optional)"),
+        "Embarked": st.selectbox("Embarked", ["C", "Q", "S"]),
+    }
 
-    if st.button("Predict"):
-        payload = {
-            "Pclass": Pclass,
-            "Sex_male": Sex_male,
-            "Embarked_Q": Embarked_Q,
-            "Embarked_S": Embarked_S,
-            "Fare_Bin": Fare_Bin,
-            "Age_Bin": Age_Bin,
-            "Family_Group": Family_Group
-        }
-        res = requests.post("http://127.0.0.1:8000/predict_processed", json=payload)
-        st.write(res.json())
+    if st.button("Predict from Raw Data"):
+        with st.spinner("Contacting model..."):
+            try:
+                response = requests.post(f"{API_URL}/predict", json=passenger_data)
+                if response.status_code == 200:
+                    result = response.json()
+                    st.success(f"✅ Prediction: {result['prediction']}, Survival Probability: {result['probability_of_survival']}")
+                else:
+                    st.error(f"❌ Error: {response.text}")
+            except Exception as e:
+                st.error(f"⚠️ Could not connect to API: {e}")
+
+
+elif input_type == "Processed Features":
+    st.subheader("Enter Preprocessed Passenger Features")
+
+    processed_data = {
+        "Pclass": st.selectbox("Class (1, 2, 3)", [1, 2, 3]),
+        "Sex_male": st.selectbox("Sex_male (1=Male, 0=Female)", [0, 1]),
+        "Age_Bin": st.number_input("Age_Bin", min_value=0, step=1),
+        "Family_Group": st.number_input("Family_Group", min_value=0, step=1),
+        "Fare_Bin": st.selectbox("Fare_Bin (0=Low,1=Mid,2=High,3=Very High)", [0, 1, 2, 3]),
+        "Embarked_Q": st.selectbox("Embarked_Q (1=Yes,0=No)", [0, 1]),
+        "Embarked_S": st.selectbox("Embarked_S (1=Yes,0=No)", [0, 1]),
+    }
+
+    if st.button("Predict from Processed Features"):
+        with st.spinner("Contacting model..."):
+            try:
+                response = requests.post(f"{API_URL}/predict_processed", json=processed_data)
+                if response.status_code == 200:
+                    result = response.json()
+                    st.success(f"✅ Prediction: {result['prediction']}, Survival Probability: {result['probability_of_survival']}")
+                else:
+                    st.error(f"❌ Error: {response.text}")
+            except Exception as e:
+                st.error(f"⚠️ Could not connect to API: {e}")
